@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { updateUserProfile, uploadProfilePicture } from '../utils/api';
+import { getAuth, PhoneAuthProvider, reauthenticateWithPhoneNumber, multiFactor } from 'firebase/auth';
 
 function UserProfile() {
   const [user, setUser] = useState({
@@ -39,6 +40,27 @@ function UserProfile() {
     } catch (error) {
       console.error('Error updating profile:', error);
       alert('Failed to update profile');
+    }
+  };
+
+  const handleEnrollMFA = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const phoneNumber = window.prompt('Enter your phone number for MFA:');
+    const appVerifier = window.recaptchaVerifier;
+
+    try {
+      const provider = new PhoneAuthProvider(auth);
+      const verificationId = await provider.verifyPhoneNumber(phoneNumber, appVerifier);
+      const verificationCode = window.prompt('Enter the verification code you received:');
+      const phoneCredential = PhoneAuthProvider.credential(verificationId, verificationCode);
+      await reauthenticateWithPhoneNumber(user, phoneCredential);
+      const multiFactorUser = multiFactor(user);
+      await multiFactorUser.enroll(phoneCredential, 'Phone number');
+      alert('MFA enrollment successful');
+    } catch (error) {
+      console.error('Error enrolling MFA:', error);
+      alert('Failed to enroll MFA');
     }
   };
 
@@ -103,6 +125,7 @@ function UserProfile() {
           <input type="text" name="notifications" value={user.notifications} onChange={handleInputChange} />
         </label>
         <button type="button" onClick={handleSave}>Save</button>
+        <button type="button" onClick={handleEnrollMFA}>Enroll in MFA</button>
       </form>
     </div>
   );

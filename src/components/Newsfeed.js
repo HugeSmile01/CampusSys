@@ -7,6 +7,8 @@ const Newsfeed = () => {
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(10);
+  const [filter, setFilter] = useState('');
+  const [sort, setSort] = useState('mostRecent');
   const { getAll, add, update, remove } = useIndexedDB('posts');
 
   useEffect(() => {
@@ -39,9 +41,29 @@ const Newsfeed = () => {
     await remove(postId);
   };
 
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value);
+  };
+
+  const handleSortChange = (e) => {
+    setSort(e.target.value);
+  };
+
+  const filteredPosts = posts.filter((post) => {
+    if (filter === '') return true;
+    return post.category === filter || post.tags.includes(filter) || post.date.includes(filter);
+  });
+
+  const sortedPosts = filteredPosts.sort((a, b) => {
+    if (sort === 'mostRecent') return new Date(b.date) - new Date(a.date);
+    if (sort === 'mostLiked') return b.likes - a.likes;
+    if (sort === 'mostCommented') return b.comments.length - a.comments.length;
+    return 0;
+  });
+
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
+  const currentPosts = sortedPosts.slice(indexOfFirstPost, indexOfLastPost);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -51,6 +73,20 @@ const Newsfeed = () => {
       <button onClick={() => handleAddPost({ title: 'New Post', content: 'This is a new post.' })}>
         Add Post
       </button>
+      <div className="filter-sort">
+        <label>
+          Filter by:
+          <input type="text" value={filter} onChange={handleFilterChange} />
+        </label>
+        <label>
+          Sort by:
+          <select value={sort} onChange={handleSortChange}>
+            <option value="mostRecent">Most Recent</option>
+            <option value="mostLiked">Most Liked</option>
+            <option value="mostCommented">Most Commented</option>
+          </select>
+        </label>
+      </div>
       {currentPosts.map((post) => (
         <Post
           key={post.id}

@@ -7,10 +7,16 @@ function Registration() {
   const [name, setName] = useState('');
   const [uniqueId, setUniqueId] = useState('');
   const [error, setError] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!captchaToken) {
+      setError('Please complete the CAPTCHA.');
+      return;
+    }
 
     try {
       const isDuplicate = await checkDuplicateLRN(lrn);
@@ -29,6 +35,10 @@ function Registration() {
     } catch (err) {
       setError('An error occurred during registration. Please try again.');
     }
+  };
+
+  const handleCaptchaChange = (token) => {
+    setCaptchaToken(token);
   };
 
   return (
@@ -52,6 +62,16 @@ function Registration() {
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="captcha">CAPTCHA:</label>
+          <input
+            type="text"
+            id="captcha"
+            value={captchaToken}
+            onChange={(e) => handleCaptchaChange(e.target.value)}
             required
           />
         </div>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getNotifications, markNotificationAsRead } from '../utils/api';
 import { useIndexedDB } from '../utils/storage';
+import firebase from 'firebase/app';
+import 'firebase/messaging';
 
 function Notifications() {
   const [notifications, setNotifications] = useState([]);
@@ -8,6 +10,7 @@ function Notifications() {
 
   useEffect(() => {
     fetchNotifications();
+    initializeFCM();
   }, []);
 
   const fetchNotifications = async () => {
@@ -26,6 +29,33 @@ function Notifications() {
       )
     );
     await update({ id, read: true });
+  };
+
+  const initializeFCM = () => {
+    const messaging = firebase.messaging();
+
+    messaging
+      .requestPermission()
+      .then(() => {
+        console.log('Notification permission granted.');
+        return messaging.getToken();
+      })
+      .then((token) => {
+        console.log('FCM Token:', token);
+        // Send the token to the server to save it for future notifications
+      })
+      .catch((err) => {
+        console.error('Unable to get permission to notify.', err);
+      });
+
+    messaging.onMessage((payload) => {
+      console.log('Message received. ', payload);
+      // Update the notifications state with the new notification
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        { id: payload.data.id, message: payload.notification.body, read: false },
+      ]);
+    });
   };
 
   return (
