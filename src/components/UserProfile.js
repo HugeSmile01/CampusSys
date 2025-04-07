@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { updateUserProfile, uploadProfilePicture } from '../utils/api';
 
 function UserProfile() {
   const [user, setUser] = useState({
@@ -23,13 +24,22 @@ function UserProfile() {
     setUser({ ...user, [name]: value });
   };
 
-  const handleProfilePictureUpload = (e) => {
+  const handleProfilePictureUpload = async (e) => {
     const file = e.target.files[0];
-    // Handle file upload logic here
+    if (file) {
+      const response = await uploadProfilePicture(user.userId, file);
+      setUser({ ...user, profilePicture: response.url });
+    }
   };
 
-  const handleSave = () => {
-    // Save user profile logic here
+  const handleSave = async () => {
+    try {
+      await updateUserProfile(user.userId, user);
+      alert('Profile updated successfully');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile');
+    }
   };
 
   return (

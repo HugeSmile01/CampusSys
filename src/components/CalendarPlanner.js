@@ -8,16 +8,16 @@ const CalendarPlanner = () => {
   const { getAll, add, update, remove } = useIndexedDB('events');
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      const localEvents = await getAll();
-      setEvents(localEvents);
-
-      const remoteEvents = await getEvents();
-      setEvents(remoteEvents);
-    };
-
     fetchEvents();
-  }, [getAll]);
+  }, []);
+
+  const fetchEvents = async () => {
+    const localEvents = await getAll();
+    setEvents(localEvents);
+
+    const remoteEvents = await getEvents();
+    setEvents(remoteEvents);
+  };
 
   const handleAddEvent = async (event) => {
     const newEvent = await addEvent(event);

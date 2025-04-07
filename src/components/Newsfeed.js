@@ -10,16 +10,16 @@ const Newsfeed = () => {
   const { getAll, add, update, remove } = useIndexedDB('posts');
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      const localPosts = await getAll();
-      setPosts(localPosts);
-
-      const remotePosts = await getPosts();
-      setPosts(remotePosts);
-    };
-
     fetchPosts();
-  }, [getAll]);
+  }, []);
+
+  const fetchPosts = async () => {
+    const localPosts = await getAll();
+    setPosts(localPosts);
+
+    const remotePosts = await getPosts();
+    setPosts(remotePosts);
+  };
 
   const handleAddPost = async (post) => {
     const newPost = await addPost(post);

@@ -1,28 +1,31 @@
 import React, { useState, useEffect } from 'react';
+import { getNotifications, markNotificationAsRead } from '../utils/api';
+import { useIndexedDB } from '../utils/storage';
 
 function Notifications() {
   const [notifications, setNotifications] = useState([]);
+  const { getAll, update } = useIndexedDB('notifications');
 
   useEffect(() => {
-    // Fetch notifications from the server or local storage
-    const fetchNotifications = async () => {
-      // Replace with actual API call or local storage retrieval
-      const fetchedNotifications = [
-        { id: 1, message: 'New event added to your calendar', read: false },
-        { id: 2, message: 'New post in the newsfeed', read: false },
-      ];
-      setNotifications(fetchedNotifications);
-    };
-
     fetchNotifications();
   }, []);
 
-  const markAsRead = (id) => {
+  const fetchNotifications = async () => {
+    const localNotifications = await getAll();
+    setNotifications(localNotifications);
+
+    const remoteNotifications = await getNotifications();
+    setNotifications(remoteNotifications);
+  };
+
+  const markAsRead = async (id) => {
+    await markNotificationAsRead(id);
     setNotifications((prevNotifications) =>
       prevNotifications.map((notification) =>
         notification.id === id ? { ...notification, read: true } : notification
       )
     );
+    await update({ id, read: true });
   };
 
   return (
