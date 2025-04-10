@@ -178,3 +178,13 @@ export const getEvents = async () => {
     throw error;
   }
 };
+
+export const addEvent = async (event) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/events`, event);
+    return response.data;
+  } catch (error) {
+    console.error('Add event error:', error);
+    throw error;
+  }
+};
