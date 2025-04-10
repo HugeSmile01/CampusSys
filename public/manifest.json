@@ -1,0 +1,24 @@
+{
+  "short_name": "CampusSys",
+  "name": "CampusSys - Campus Management System",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "description": "A web application for students and teachers within the campus.",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US"
+}
