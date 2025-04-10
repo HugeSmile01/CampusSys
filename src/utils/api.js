@@ -168,3 +168,13 @@ export const deleteCalendarEvent = async (eventId) => {
     throw error;
   }
 };
+
+export const getEvents = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/events`);
+    return response.data;
+  } catch (error) {
+    console.error('Get events error:', error);
+    throw error;
+  }
+};
